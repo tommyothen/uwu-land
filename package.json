@@ -9,5 +9,15 @@
   },
   "keywords": [],
   "author": "DaSushiAsian",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "firebase-admin": "^8.13.0",
+    "nanoid": "^3.1.10",
+    "yup": "^0.29.1"
+  }
 }
