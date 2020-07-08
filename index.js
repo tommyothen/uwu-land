@@ -5,6 +5,7 @@ const nanoid = require("nanoid").nanoid;
 const yup = require("yup");
 const rateLimit = require("express-rate-limit");
 const slowDown = require("express-slow-down");
+const cors = require("cors");
 
 const serviceAccount = require("./token/serviceAccountKey.json");
 admin.initializeApp({
@@ -26,6 +27,11 @@ const speedLimiter = slowDown({
   delayAfter: 1,
   delayMs: 100
 });
+
+const corsOptions = {
+  origin: 'http://example.com',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
 
 const schema = yup.object().shape({
   id: yup.string().trim().matches(/^[\w\-]+$/i),
