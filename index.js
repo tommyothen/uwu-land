@@ -4,7 +4,7 @@ const express = require("express");
 const nanoid = require("nanoid").nanoid;
 const yup = require("yup");
 
-const serviceAccount = require("./firebase/serviceAccountKey.json");
+const serviceAccount = require("./token/serviceAccountKey.json");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
@@ -22,6 +22,7 @@ const schema = yup.object().shape({
 app.get("/", (req, res) => {
   res.redirect(process.env.NODE_ENV == "production" ? "https://app.uwu.land" : `http://localhost:${process.env.APP_PORT || 4551}`);
 });
+
 
 const port = process.env.PORT || 4550;
 app.listen(port, () => {
