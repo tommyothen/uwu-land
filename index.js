@@ -3,6 +3,8 @@ const admin = require("firebase-admin");
 const express = require("express");
 const nanoid = require("nanoid").nanoid;
 const yup = require("yup");
+const rateLimit = require("express-rate-limit");
+const slowDown = require("express-slow-down");
 
 const serviceAccount = require("./token/serviceAccountKey.json");
 admin.initializeApp({
@@ -14,6 +16,17 @@ const app = express();
 app.enable('trust proxy');
 app.use(express.json());
 
+const limiter = rateLimit({
+  windowMs: 2 * 1000,
+  max: 1
+});
+
+const speedLimiter = slowDown({
+  windowMs: 30 * 1000,
+  delayAfter: 1,
+  delayMs: 100
+});
+
 const schema = yup.object().shape({
   id: yup.string().trim().matches(/^[\w\-]+$/i),
   url: yup.string().trim().url().required()
@@ -23,7 +36,7 @@ app.get("/", (req, res) => {
   res.redirect(process.env.NODE_ENV == "production" ? "https://app.uwu.land" : `http://localhost:${process.env.APP_PORT || 4551}`);
 });
 
-app.post("/api", async (req, res, next) => {
+app.post("/api", limiter, speedLimiter, async (req, res, next) => {
   try {
     let id = req.headers.id;
     let url = req.headers.url;
@@ -56,7 +69,7 @@ app.post("/api", async (req, res, next) => {
   }
 });
 
-app.use("/:id", async (req, res, next) => {
+app.use("/:id", limiter, speedLimiter, async (req, res, next) => {
   try {
     let id = req.params.id;
     let urlsRef = db.collection('urls').doc(id);
