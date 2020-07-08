@@ -28,6 +28,17 @@ const speedLimiter = slowDown({
   delayMs: 100
 });
 
+const publicLimiter = rateLimit({
+  windowMs: 30 * 1000,
+  max: 10
+});
+
+const publicSpeedLimiter = slowDown({
+  windowMs: 30 * 1000,
+  delayAfter: 1,
+  delayMs: 200
+});
+
 const corsOptions = {
   origin: 'https://app.uwu.land',
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
@@ -42,34 +53,46 @@ app.get("/", (req, res) => {
   res.redirect(process.env.NODE_ENV == "production" ? "https://app.uwu.land" : `http://localhost:${process.env.APP_PORT || 4551}`);
 });
 
+const makeLink = async (req, res) => {
+  let id = req.headers.id;
+  let url = req.headers.url;
+  if (!url) throw new Error("Header param 'url' not given. 🎁");
+  if (url.includes("uwu.land")) throw new Error("Stop 🛑");
+  if (!id) id = nanoid(5);
+
+  let urlsRef = db.collection('urls').doc(id);
+  let doc = await urlsRef.get();
+  if (doc.exists) throw new Error("ID already taken. 🚄");
+
+  await schema.validate({
+    id,
+    url
+  });
+
+  await urlsRef.set({
+    id,
+    url,
+    "total clicks": 0
+  });
+
+  res.json({
+    id,
+    url,
+    "total clicks": 0
+  });
+};
+
+app.post("/public", publicLimiter, publicSpeedLimiter, cors(corsOptions), async (req, res, next) => {
+  try {
+    makeLink(req, res);
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.post("/api", limiter, speedLimiter, async (req, res, next) => {
   try {
-    let id = req.headers.id;
-    let url = req.headers.url;
-    if (!url) throw new Error("Header param 'url' not given. 🎁");
-    if (url.includes("uwu.land")) throw new Error("Stop 🛑");
-    if (!id) id = nanoid(5);
-
-    let urlsRef = db.collection('urls').doc(id);
-    let doc = await urlsRef.get();
-    if (doc.exists) throw new Error("ID already taken. 🚄");
-
-    await schema.validate({
-      id,
-      url
-    });
-
-    await urlsRef.set({
-      id,
-      url,
-      "total clicks": 0
-    });
-
-    res.json({
-      id,
-      url,
-      "total clicks": 0
-    });
+    makeLink(req, res);
   } catch (error) {
     next(error);
   }
