@@ -22,3 +22,8 @@ const schema = yup.object().shape({
 app.get("/", (req, res) => {
   res.redirect(process.env.NODE_ENV == "production" ? "https://app.uwu.land" : `http://localhost:${process.env.APP_PORT || 4551}`);
 });
+
+const port = process.env.PORT || 4550;
+app.listen(port, () => {
+  console.log(`App live at http://localhost:${port}`);
+});
