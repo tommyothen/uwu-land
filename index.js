@@ -23,6 +23,23 @@ app.get("/", (req, res) => {
   res.redirect(process.env.NODE_ENV == "production" ? "https://app.uwu.land" : `http://localhost:${process.env.APP_PORT || 4551}`);
 });
 
+app.use("/:id", async (req, res, next) => {
+  try {
+    let id = req.params.id;
+    let urlsRef = db.collection('urls').doc(id);
+
+    let doc = await urlsRef.get();
+
+    if (doc.exists) {
+      res.redirect(doc.data().url);
+      urlsRef.update({ "total clicks": admin.firestore.FieldValue.increment(1)});
+    } else {
+      throw new Error("URL not found. 🔎");
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 const port = process.env.PORT || 4550;
 app.listen(port, () => {
