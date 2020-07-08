@@ -29,7 +29,7 @@ const speedLimiter = slowDown({
 });
 
 const corsOptions = {
-  origin: 'http://example.com',
+  origin: 'https://app.uwu.land',
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
