@@ -18,3 +18,7 @@ const schema = yup.object().shape({
   id: yup.string().trim().matches(/^[\w\-]+$/i),
   url: yup.string().trim().url().required()
 });
+
+app.get("/", (req, res) => {
+  res.redirect(process.env.NODE_ENV == "production" ? "https://app.uwu.land" : `http://localhost:${process.env.APP_PORT || 4551}`);
+});
