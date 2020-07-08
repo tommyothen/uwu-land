@@ -28,7 +28,7 @@ app.post("/api", async (req, res, next) => {
     let id = req.headers.id;
     let url = req.headers.url;
     if (!url) throw new Error("Header param 'url' not given. 🎁");
-    if(url.includes("uwu.land")) throw new Error("Stop 🛑");
+    if (url.includes("uwu.land")) throw new Error("Stop 🛑");
     if (!id) id = nanoid(5);
 
     let urlsRef = db.collection('urls').doc(id);
