@@ -23,6 +23,39 @@ app.get("/", (req, res) => {
   res.redirect(process.env.NODE_ENV == "production" ? "https://app.uwu.land" : `http://localhost:${process.env.APP_PORT || 4551}`);
 });
 
+app.post("/api", async (req, res, next) => {
+  try {
+    let id = req.headers.id;
+    let url = req.headers.url;
+    if (!url) throw new Error("Header param 'url' not given. 🎁");
+    if(url.includes("uwu.land")) throw new Error("Stop 🛑");
+    if (!id) id = nanoid(5);
+
+    let urlsRef = db.collection('urls').doc(id);
+    let doc = await urlsRef.get();
+    if (doc.exists) throw new Error("ID already taken. 🚄");
+
+    await schema.validate({
+      id,
+      url
+    });
+
+    await urlsRef.set({
+      id,
+      url,
+      "total clicks": 0
+    });
+
+    res.json({
+      id,
+      url,
+      "total clicks": 0
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.use("/:id", async (req, res, next) => {
   try {
     let id = req.params.id;
@@ -32,7 +65,9 @@ app.use("/:id", async (req, res, next) => {
 
     if (doc.exists) {
       res.redirect(doc.data().url);
-      urlsRef.update({ "total clicks": admin.firestore.FieldValue.increment(1)});
+      urlsRef.update({
+        "total clicks": admin.firestore.FieldValue.increment(1)
+      });
     } else {
       throw new Error("URL not found. 🔎");
     }
