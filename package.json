@@ -1,12 +1,13 @@
 {
-  "name": "_",
+  "name": "uwuland",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon .",
+    "prod": "NODE_ENV=production node ."
   },
   "keywords": [],
-  "author": "",
+  "author": "DaSushiAsian",
   "license": "ISC"
 }
