@@ -4,3 +4,8 @@ const express = require("express");
 const nanoid = require("nanoid").nanoid;
 const yup = require("yup");
 
+const serviceAccount = require("./firebase/serviceAccountKey.json");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+const db = admin.firestore();
