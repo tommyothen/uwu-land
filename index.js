@@ -14,3 +14,7 @@ const app = express();
 app.enable('trust proxy');
 app.use(express.json());
 
+const schema = yup.object().shape({
+  id: yup.string().trim().matches(/^[\w\-]+$/i),
+  url: yup.string().trim().url().required()
+});
