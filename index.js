@@ -41,6 +41,18 @@ app.use("/:id", async (req, res, next) => {
   }
 });
 
+app.use((error, req, res, next) => {
+  if (error.status) {
+    res.status(error.status);
+  } else {
+    res.status(500);
+  }
+  res.json({
+    message: error.message,
+    stack: process.env.NODE_ENV === 'production' ? '🥞' : error.stack,
+  });
+});
+
 const port = process.env.PORT || 4550;
 app.listen(port, () => {
   console.log(`App live at http://localhost:${port}`);
