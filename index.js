@@ -53,8 +53,9 @@ app.get("/", (req, res) => {
   res.redirect(process.env.NODE_ENV == "production" ? "https://app.uwu.land" : `http://localhost:${process.env.APP_PORT || 4551}`);
 });
 
-const makeLink = async (req, res) => {
-  let id = req.headers.id;
+const makeLink = async (req, res, next) => {
+  try {
+    let id = req.headers.id;
   let url = req.headers.url;
   if (!url) throw new Error("Header param 'url' not given. 🎁");
   if (url.includes("uwu.land")) throw new Error("Stop 🛑");
@@ -80,22 +81,17 @@ const makeLink = async (req, res) => {
     url,
     "total clicks": 0
   });
+  } catch (error) {
+    next(error);
+  }
 };
 
 app.post("/public", publicLimiter, publicSpeedLimiter, cors(corsOptions), async (req, res, next) => {
-  try {
-    makeLink(req, res);
-  } catch (error) {
-    next(error);
-  }
+  makeLink(req, res, next);
 });
 
 app.post("/api", limiter, speedLimiter, async (req, res, next) => {
-  try {
-    makeLink(req, res);
-  } catch (error) {
-    next(error);
-  }
+  makeLink(req, res, next);
 });
 
 app.use("/:id", limiter, speedLimiter, async (req, res, next) => {
