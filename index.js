@@ -7,10 +7,16 @@ const rateLimit = require("express-rate-limit");
 const slowDown = require("express-slow-down");
 const cors = require("cors");
 
-const serviceAccount = require("./token/serviceAccountKey.json");
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+if(process.env.NODE_ENV == "production") {
+  admin.initializeApp({
+    credential: admin.credential.applicationDefault()
+  });
+} else {
+  const serviceAccount = require("./token/serviceAccountKey.json");
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
+}
 const db = admin.firestore();
 
 const app = express();
