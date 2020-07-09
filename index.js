@@ -39,11 +39,6 @@ const publicSpeedLimiter = slowDown({
   delayMs: 200
 });
 
-const corsOptions = {
-  origin: 'https://app.uwu.land',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-};
-
 const schema = yup.object().shape({
   id: yup.string().trim().matches(/^[\w\-]+$/i),
   url: yup.string().trim().url().required()
@@ -86,6 +81,17 @@ const makeLink = async (req, res, next) => {
   }
 };
 
+const whitelist = ['https://app.uwu.land', 'http://localhost:4550'];
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+};
+app.options('/public', cors(corsOptions));
 app.post("/public", publicLimiter, publicSpeedLimiter, cors(corsOptions), async (req, res, next) => {
   makeLink(req, res, next);
 });
