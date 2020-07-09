@@ -6,6 +6,8 @@ const yup = require("yup");
 const rateLimit = require("express-rate-limit");
 const slowDown = require("express-slow-down");
 const cors = require("cors");
+const helmet = require("helmet");
+const morgan = require("morgan");
 
 if(process.env.NODE_ENV == "production") {
   admin.initializeApp({
@@ -22,6 +24,8 @@ const db = admin.firestore();
 const app = express();
 app.enable('trust proxy');
 app.use(express.json());
+app.use(helmet());
+app.use(morgan('common'));
 
 const limiter = rateLimit({
   windowMs: 2 * 1000,
