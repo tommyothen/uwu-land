@@ -81,7 +81,7 @@ const makeLink = async (req, res, next) => {
   }
 };
 
-const whitelist = ['https://app.uwu.land', 'http://localhost:4550'];
+const whitelist = ['https://app.uwu.land', `http://localhost:${process.env.APP_PORT || 4550}`];
 const corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
@@ -97,6 +97,24 @@ app.post("/public", publicLimiter, publicSpeedLimiter, cors(corsOptions), async 
 });
 
 app.post("/api", limiter, speedLimiter, async (req, res, next) => {
+  try {
+    const key = req.get("X-API-KEY");
+
+    if (!key) {
+      throw new Error("Invalid API Key. 🔐");
+    }
+
+    let keysRef = db.collection('apikeys').doc(key);
+    let doc = await keysRef.get();
+    if (doc.exists) {
+      next();
+    } else {
+      throw new Error("Invalid API Key. 🔐");
+    }
+  } catch (error) {
+    next(error);
+  }
+}, async (req, res, next) => {
   makeLink(req, res, next);
 });
 
