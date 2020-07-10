@@ -78,13 +78,15 @@ const makeLink = async (req, res, next) => {
     await urlsRef.set({
       id,
       url,
-      "total clicks": 0
+      "total clicks": 0,
+      "shortened": `https://${process.env.SELF_DOMAIN}/${id}`
     });
 
     res.json({
       id,
       url,
-      "total clicks": 0
+      "total clicks": 0,
+      "shortened": `https://${process.env.SELF_DOMAIN}/${id}`
     });
   } catch (error) {
     next(error);
