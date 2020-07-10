@@ -55,7 +55,7 @@ const schema = yup.object().shape({
 });
 
 app.get("/", (req, res) => {
-  res.redirect(process.env.NODE_ENV == "production" ? `https://${process.env.SISTER_DOMAIN}` : `http://localhost:${process.env.SISTER_PORT || 4551}`);
+  res.redirect(process.env.NODE_ENV == "production" ? `https://${process.env.SISTER_DOMAIN}` : `http://localhost:${process.env.SISTER_PORT || 8081}`);
 });
 
 const makeLink = async (req, res, next) => {
@@ -91,7 +91,7 @@ const makeLink = async (req, res, next) => {
   }
 };
 
-const whitelist = [`https://${process.env.SISTER_DOMAIN}`, `http://localhost:${process.env.SISTER_PORT || 4550}`];
+const whitelist = [`https://${process.env.SISTER_DOMAIN}`, `http://localhost:${process.env.SISTER_PORT || 8081}`];
 const corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
@@ -160,7 +160,7 @@ app.use((error, req, res, next) => {
   });
 });
 
-const port = process.env.PORT || 4550;
+const port = process.env.PORT || 8080;
 app.listen(port, () => {
   console.log(`App live at http://localhost:${port}`);
 });
