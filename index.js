@@ -28,8 +28,8 @@ app.use(helmet());
 app.use(morgan('common'));
 
 const limiter = rateLimit({
-  windowMs: 2 * 1000,
-  max: 1
+  windowMs: 60 * 1000,
+  max: 45
 });
 
 const speedLimiter = slowDown({
