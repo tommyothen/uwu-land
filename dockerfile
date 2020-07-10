@@ -4,6 +4,8 @@ WORKDIR /usr/src/app
 ENV PORT 8080
 ENV HOST 0.0.0.0
 ENV NODE_ENV production
+ENV SELF_DOMAIN uwu.land
+ENV SISTER DOMAIN app.uwu.land
 
 COPY package*.json ./
 

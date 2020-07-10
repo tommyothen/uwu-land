@@ -55,7 +55,7 @@ const schema = yup.object().shape({
 });
 
 app.get("/", (req, res) => {
-  res.redirect(process.env.NODE_ENV == "production" ? "https://app.uwu.land" : `http://localhost:${process.env.APP_PORT || 4551}`);
+  res.redirect(process.env.NODE_ENV == "production" ? `https://${process.env.SISTER_DOMAIN}` : `http://localhost:${process.env.APP_PORT || 4551}`);
 });
 
 const makeLink = async (req, res, next) => {
@@ -63,7 +63,7 @@ const makeLink = async (req, res, next) => {
     let id = req.headers.id;
     let url = req.headers.url;
     if (!url) throw new Error("Header param 'url' not given. 🎁");
-    if (url.includes("uwu.land")) throw new Error("Stop 🛑");
+    if (url.includes(process.env.SELF_DOMAIN)) throw new Error("Stop 🛑");
     if (!id) id = nanoid(5);
 
     let urlsRef = db.collection('urls').doc(id);
@@ -91,7 +91,7 @@ const makeLink = async (req, res, next) => {
   }
 };
 
-const whitelist = ['https://app.uwu.land', `http://localhost:${process.env.APP_PORT || 4550}`];
+const whitelist = [`https://${process.env.SISTER_DOMAIN}`, `http://localhost:${process.env.APP_PORT || 4550}`];
 const corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
