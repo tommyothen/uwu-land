@@ -92,7 +92,7 @@ const makeLink = async (req, res, next) => {
   }
 };
 
-const whitelist = [`https://${process.env.SISTER_DOMAIN}`, `http://localhost:${process.env.SISTER_PORT || 8081}`, `http://127.0.0.1:${process.env.SISTER_PORT || 8081}`];
+const whitelist = [`https://${process.env.SISTER_DOMAIN}`, `http://${process.env.HOST || 'localhost'}:${process.env.SISTER_PORT || 8081}`];
 const corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
