@@ -106,7 +106,8 @@ app.post("/public", publicLimiter, publicSpeedLimiter, cors(corsOptions), async 
   makeLink(req, res, next);
 });
 
-app.post("/api", limiter, speedLimiter, async (req, res, next) => {
+app.options('/api', cors({origin: "*"}));
+app.post("/api", limiter, speedLimiter, cors({origin: "*"}), async (req, res, next) => {
   try {
     const key = req.get("X-API-KEY");
 
