@@ -1,0 +1,5 @@
+# Web crawlers don't really work with a site like this.
+# Using the subdomain app.uwu.land would work better as
+# this is soley for redirecting and api usage
+User-agent: *
+Disallow: /

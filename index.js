@@ -9,7 +9,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 
-if(process.env.NODE_ENV == "production") {
+if (process.env.NODE_ENV == "production") {
   admin.initializeApp({
     credential: admin.credential.applicationDefault()
   });
@@ -56,6 +56,12 @@ const schema = yup.object().shape({
 
 app.get("/", (req, res) => {
   res.redirect(process.env.NODE_ENV == "production" ? `https://${process.env.SISTER_DOMAIN}` : `http://localhost:${process.env.SISTER_PORT || 8081}`);
+});
+
+app.get("/robots.txt", (req, res) => {
+  res.sendFile("robots.txt", {
+    root: __dirname
+  });
 });
 
 const makeLink = async (req, res, next) => {
@@ -106,8 +112,12 @@ app.post("/public", publicLimiter, publicSpeedLimiter, cors(corsOptions), async 
   makeLink(req, res, next);
 });
 
-app.options('/api', cors({origin: "*"}));
-app.post("/api", limiter, speedLimiter, cors({origin: "*"}), async (req, res, next) => {
+app.options('/api', cors({
+  origin: "*"
+}));
+app.post("/api", limiter, speedLimiter, cors({
+  origin: "*"
+}), async (req, res, next) => {
   try {
     const key = req.get("X-API-KEY");
 
