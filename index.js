@@ -88,12 +88,12 @@ const makeLink = async (req, res, next) => {
     });
 
     if(req.get("X-API-KEY")) {
-      const ownerRef = db.collection('apikeys').document(req.get("X-API-KEY"));
+      const ownerRef = db.collection('apikeys').doc(req.get("X-API-KEY"));
       const ownerDoc = await ownerRef.get();
 
       if(ownerDoc.exists) {
         const ownerUID = ownerDoc.data().author;
-        const logURLRef = db.collection('users').document(ownerUID).collection('urls').document(id);
+        const logURLRef = db.collection('users').doc(ownerUID).collection('urls').doc(id);
 
         await logURLRef.set({
           id,
