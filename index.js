@@ -87,6 +87,21 @@ const makeLink = async (req, res, next) => {
       "total clicks": 0
     });
 
+    if(req.get("X-API-KEY")) {
+      const ownerRef = db.collection('apikeys').document(req.get("X-API-KEY"));
+      const ownerDoc = await ownerRef.get();
+
+      if(ownerDoc.exists) {
+        const ownerUID = ownerDoc.data().author;
+        const logURLRef = db.collection('users').document(ownerUID).collection('urls').document(id);
+
+        await logURLRef.set({
+          id,
+          url,
+        });
+      }
+    }
+
     res.json({
       id,
       url,
