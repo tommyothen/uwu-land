@@ -8,6 +8,7 @@ const slowDown = require("express-slow-down");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const followRedirects = require("follow-redirects");
 
 if (process.env.NODE_ENV == "production") {
   admin.initializeApp({
@@ -54,6 +55,9 @@ const schema = yup.object().shape({
   url: yup.string().trim().url().required()
 });
 
+followRedirects.maxRedirects = 1;
+followRedirects.maxBodyLength = 20 * 1024 * 1024;
+
 app.get("/", (req, res) => {
   res.redirect(process.env.NODE_ENV == "production" ? `https://${process.env.SISTER_DOMAIN}` : `http://localhost:${process.env.SISTER_PORT || 8081}`);
 });
@@ -70,6 +74,19 @@ const makeLink = async (req, res, next) => {
     let url = req.headers.url;
     if (!url) throw new Error("Header param 'url' not given. 🎁");
     if (url.includes(process.env.SELF_DOMAIN)) throw new Error("Stop 🛑");
+    try {
+      if (/^https/.test(url)) {
+        followRedirects.https.get(url, () => {}).on('error', err => {
+          throw new Error(err);
+        });
+      } else {
+        followRedirects.http.get(url, () => {}).on('error', err => {
+          throw new Error(err);
+        });
+      }
+    } catch (error) {
+      throw new Error(error);
+    }
     if (!id) id = nanoid(5);
 
     let urlsRef = db.collection('urls').doc(id);
@@ -87,11 +104,11 @@ const makeLink = async (req, res, next) => {
       "total clicks": 0
     });
 
-    if(req.get("X-API-KEY")) {
+    if (req.get("X-API-KEY")) {
       const ownerRef = db.collection('apikeys').doc(req.get("X-API-KEY"));
       const ownerDoc = await ownerRef.get();
 
-      if(ownerDoc.exists) {
+      if (ownerDoc.exists) {
         const ownerUID = ownerDoc.data().author;
         const logURLRef = db.collection('users').doc(ownerUID).collection('urls').doc(id);
 
