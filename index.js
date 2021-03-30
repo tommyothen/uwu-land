@@ -23,8 +23,6 @@ const credentials = {
   client_x509_cert_url: process.env.client_x509_cert_url
 };
 
-console.log(credentials);
-
 admin.initializeApp({
   credential: admin.credential.cert(credentials)
 });
